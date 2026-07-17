@@ -1,0 +1,52 @@
+---
+title: "Trabajo final"
+format: html
+editor: visual
+---
+
+### ***1 - Introducción***
+
+Objetivo del trabajo.
+
+Qué es el All-Star.
+
+Por qué es interesante estudiar qué estadísticas se relacionan con ser All-Star.
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+```
+
+### *2 - Carga de datos*
+
+```{r}
+datos <- read_csv("data/nba_players.csv")
+```
+
+### *3 - Exploracion inicial de los datos*
+
+```{r}
+glimpse(datos)
+```
+
+```{r}
+summary(datos)
+```
+
+```{r}
+stats5 <- datos %>% 
+  select(PTS, TRB, AST, STL, BLK)
+```
+
+### *4 - Limpieza y preparación*
+
+### 
+*5 - Análisis descriptivo*
+
+###  *6 - Modelos predictivos* 
+
+### *7 - Evaluación de modelos* 
+
+### *8 - Conclusiones*
