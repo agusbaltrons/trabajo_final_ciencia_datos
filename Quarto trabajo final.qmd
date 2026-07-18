@@ -14,23 +14,40 @@ Con este trabajo estudiaremos la relación entre algunas estadísticas individua
 
 Para responder esta pregunta se realizaremos un análisis exploratorio de los datos, se entrenará un modelo de Random Forest para clasificar jugadores como All-Star o No All-Star y se desarrollará una aplicación Shiny que permita estimar dicha probabilidad de forma interactiva.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+#Librerías a utilizar
 library(tidyverse)
+library(tidymodels)
 library(ggplot2)
 library(rpart)
 library(rpart.plot)
 library(plotly)
+library(knitr)
+library(gt)
+library(dplyr)
+library(purrr)
+library(vip)
 ```
 
 ### *2 - Carga de datos*
 
-La base de datos se descargó desde la web de Open ML, desde el siguiente link: <https://www.openml.org/search?type=data&status=active&id=43653>. Si bien el archivo original es de tipo ARFF, se convirtió a formato CSV para facilitar su manipulación en R..
+La base de datos se descargó desde la web de Open ML, desde el siguiente link: <https://www.openml.org/search?type=data&status=active&id=43653>. Si bien el archivo original es de tipo ARFF, se convirtió a formato CSV para facilitar su manipulación en R.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 datos <- read_csv("data/nba_players.csv")
 ```
 
-El dataset cuenta con 1408 observaciones, cada observación representa el rendimiento de un jugador en una temporada determinada, por lo que cada jugador puede aparecer hasta tres veces en el dataset, y 45 variables, a continuación se explican las más relevantes:
+```{r}
+#Estructura de los datos
+tibble(
+  Variable = names(datos),
+  Tipo = sapply(datos, class),
+  Ejemplo = map_chr(datos, ~ paste(head(unique(.x), 3), 
+                                   collapse = ", "))) %>%
+  gt()
+```
+
+El dataset cuenta con 45 variables y 1408 observaciones, donde cada observación representa el rendimiento de un jugador en temporada determinada, por lo que cada jugador puede aparecer hasta tres veces en el dataset. A continuación se explican las variables más relevantes:
 
 | Variable | Descripción                       |
 |----------|-----------------------------------|
@@ -48,7 +65,7 @@ El dataset cuenta con 1408 observaciones, cada observación representa el rendim
 
 ### *3 - Análisis exploratorio de los datos.*
 
-Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17, para evitar repetir observaciones de un mismo jugador, que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, excluyendo a los jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.
+Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17 para evitar repetir observaciones de un mismo jugador que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.
 
 ```{r}
 an_exp <- datos %>% 
@@ -56,44 +73,62 @@ an_exp <- datos %>%
   select(Player.x, Pos1, G, MP, TRB, AST, STL, BLK, PTS, Play)
 ```
 
-Aplicamos los filtros antes mencionados y hacemos una selección de las variable que nos interesaran en el trabajo, tanto en el análisis exploratorio como en el modelo de clasificación. Conservamos las variables PTS, TRB, AST, STL y BLK, que son las 5 estadísticas básicas con las que se suele analizar el rendimiento de un jugador, así como la variable Player.x para poder identificar a los jugadores. Además incluimos las variables G, MP y Pos1, que nos serán de utilidad en el análisis. La variable Play será nuestra variable de respuesta en el modelo, asi que también la incluimos.
+Aplicamos los filtros antes mencionados y hacemos una selección de las variable que nos interesaran en el trabajo, tanto en el análisis exploratorio como en el modelo de clasificación. Conservamos las variables PTS, TRB, AST, STL y BLK, que son las 5 estadísticas básicas con las que se suele analizar el rendimiento de un jugador, así como la variable Player.x para poder identificar a los jugadores. Además incluimos las variables G, MP y Pos1, que nos serán de utilidad en el análisis. La variable Play será nuestra variable de respuesta en el modelo, por lo que también la incluimos.
+
+A continuación se visualizarán algunos gráficos comparando las distintas variables diferenciando si el jugador fue seleccionado como All-Star o no, plasmando las observaciones de forma tanto grupal (boxplot) como individual para así visualizar la variabilidad de los datos.
+
+1.  ¿Los All-Star anotan más?
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = PTS, fill = Play)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(title = "Puntos por partido según condición de All-Star", x = "", y = "Puntos por partido") +
+  labs(title = "Puntos por partido según condición de All-Star", 
+       x = "", y = "Puntos por partido") +
   theme_classic() +
   theme(legend.position = "no")
 ```
+
+En términos generales se observa que para los jugadores que fueron All-Star se presenta una mayor mediana de puntos por partidos en comparación a aquellos que no lo fueron. La distribución de los valores de quienes fueron seleccionados tiende a tener un desplazamiento hacia valores más altos, lo que sugiere un mayor rendimiento ofensivo en los jugadores. En conjunto el gráfico respalda la existencia de una relación positiva entre la condición de All-Star y un mayor promedio de puntos por partido durante la temporada 2016-17.
+
+Los jugadores All-Star presentan valores centrales superiores de puntos por partido respecto al resto de jugadores, evidenciando una mayor capacidad ofensiva.
+
+2.  ¿Los jugadores All-Star participan más del juego colectivo?
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = AST, fill = Play)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(title = "Asistencias por partido según condición de All-Star", x = "", y = "Asistencias por partido") +
+  labs(title = "Asistencias por partido según condición de All-Star", 
+       x = "", y = "Asistencias por partido") +
   theme_classic() +
   theme(legend.position = "no")
 ```
+
+Los jugadores All-Star presentan valores centrales superiores al resto de jugadores con respecto a las asistencias por partido, por lo que podemos afirmar que se relacionan positivamente con la generación de juego y el juego en equipo.
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = TRB, fill = Play)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(title = "Rebotes por partido según condición de All-Star", x = "", y = "Rebotes por partido") +
+  labs(title = "Rebotes por partido según condición de All-Star", 
+       x = "", y = "Rebotes por partido") +
   theme_classic() +
   theme(legend.position = "no")
 ```
+
+3.  ¿Existe diferencia en la contribución defensiva?
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = BLK, fill = Play)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(title = "Tapas por partido según condición de All-Star", x = "", y = "Tapas por partido") +
+  labs(title = "Tapas por partido según condición de All-Star", 
+       x = "", y = "Tapas por partido") +
   theme_classic() +
   theme(legend.position = "no")
 ```
@@ -103,9 +138,71 @@ ggplot(an_exp, aes(x = Play, y = STL, fill = Play)) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(title = "Robos por partido según condición de All-Star", x = "", y = "Robos por partido") +
+  labs(title = "Robos por partido según condición de All-Star", 
+       x = "", y = "Robos por partido") +
   theme_classic() +
   theme(legend.position = "no")
 ```
 
--   interpretación a cada grafico y tratar de agregar el plotly
+Si bien los valores defensivos son mayores en los jugadores seleccionados All-Star que en los que no lo fueron, la diferencia es menor que en otras variables anteriores. Asi mismo presentan mayor nivel defensivo que aquellos jugadores que no fueron seleccionados.
+
+- interpretación a cada grafico y tratar de agregar el plotly
+
+A modo de resumen:
+
+```{r}
+an_exp |> 
+  group_by(Play) |> 
+  summarise(across(c('PTS', 'AST', 'TRB', 'BLK', 'STL'),
+                   list(mediana = ~median(.x)))) |> 
+  kable()
+```
+
+Si bien a la hora de elegir a un jugador como All Star se basan en un conjunto de variables, cada una de ellas influye de forma diferente. A raíz de estos gráficos podemos afirmar que la variable PTS es en la cual se visualiza mayor diferencia entre un jugador que haya sido All Star y uno que no, las variables AST y TRB presentan diferencias aunque en menor medida, mientras que las variables STL y BLK son las que menos diferencias presentan. En las 5 situaciones la diferencia se visualiza a favor de quienes fueron seleccionados All-Star.
+
+[*Conclusión del análisis exploratorio*]{.underline}
+
+Este análisis permitió identificar diferencias claras entre jugadores All-Star y no All-Star. Los primeros presentan mayores niveles de producción ofensiva y mejores niveles en distintas estadísticas individuales. Sin embargo la condición All-Star no parece depender de una única variable, sino de una combinación de factores asociados al rendimiento global del jugador.
+
+### *4 - Limpieza y preparación*
+
+Objetivo: ¿Qué características diferencian a los jugadores All-Star de aquellos que no fueron seleccionados? ¿Podemos encontrar una forma de indicar la probabilidad de que un jugador sea seleccionado All-Star? ¿Podemos predecir que un jugador sea All-Star?
+
+FOREST
+
+Preparación de datos.
+
+```{r}
+nba <- datos %>% 
+  filter(Season == "2016-17", G >= 60) |>  
+  select(Player.x, TRB, AST, STL, BLK, PTS, Play) |> 
+  mutate(Play = as.factor(Play))
+```
+
+Separación de los datos en entrenamiento y testeo.
+
+```{r}
+set.seed(123)
+nba_split <- initial_split(nba, prop = 0.8, strata = Play)
+nba_train <- training(nba_split)
+nba_test <- testing(nba_split)
+```
+
+Entrenar el modelo.
+
+```{r}
+nba_rf <- rand_forest(trees = 500, min_n = 5) |> 
+  set_engine('ranger', importance = 'impurity') |> 
+  set_mode('classification') |> 
+  fit(Play~., data = nba_train)
+nba_rf |> vip()
+```
+
+```{r}
+nba_resultados = nba_train |> 
+  select(Play) |> 
+  bind_cols(predict(nba_rf, nba_train)) |> 
+  rename(.pred_rf = .pred_class)
+
+nba_resultados |> head()
+```
