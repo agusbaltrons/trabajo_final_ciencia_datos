@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.555">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Trabajo final</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Quarto trabajo final_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Quarto trabajo final_files/libs/quarto-html/quarto.js"></script>
+<script src="Quarto trabajo final_files/libs/quarto-html/popper.min.js"></script>
+<script src="Quarto trabajo final_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Quarto trabajo final_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Quarto trabajo final_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Quarto trabajo final_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Quarto trabajo final_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Quarto trabajo final_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Quarto trabajo final_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Trabajo final</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introducción" class="level3">
+<h3 class="anchored" data-anchor-id="introducción"><strong><em>1 - Introducción</em></strong></h3>
+<p>La NBA es la mejor liga de basket del mundo y en lo que ha sido su evolución a lo largo de la historia las estadísticas han jugado un papel muy importante. A día de hoy las estadísticas son el principal sustento a la hora de tomar decisiones deportivas, buscando maximizar la eficiencia y sacar el máximo provecho de cada jugada. Para esto se hace un relevamiento de cada estadística, desde las más básicas, como puede ser el conteo de puntos, asistencias y rebotes, hasta las más avanzadas, que pueden incluir cálculos matemáticos bastante complejos.</p>
+<p>Uno de los grandes momentos de cada temporada de la NBA es juego de las estrellas (All Star Game), un partido que se realiza poco después de la mitad de la temporada donde los jugadores que están teniendo una actuación destacada en la temporada son seleccionados para jugar un partido entre ellos. Esto significa un gran logro para cualquier jugador, algunos ya son habituales en este tipo de partidos, otros son seleccionados para este partido unas pocas veces en su carrera y la gran mayoría jamás llegan a jugar uno. La selección de los jugadores que participan del All Star no es sencilla y se hace a través de cuatro ramas que votan a quienes consideran los mejores: el público, los jugadores y un grupo de periodistas especializados seleccionan a los 5 titulares de cada conferencia, mientras que los siete suplentes de cada equipo son elegidos por votación de todos los entrenadores de la liga.</p>
+<p>Con este trabajo estudiaremos la relación entre algunas estadísticas individuales y la selección de un jugador para el All Star a través de un modelo de clasificación que permita asignarle a un jugador una probabilidad de ser seleccionado al All Star según sus estadísticas de la temporada. ¿Existe una combinación de estadísticas que permita explicar la selección de un jugador al All Star o influyen otros factores que no tienen que ver con los datos?</p>
+<p>Para responder esta pregunta se realizaremos un análisis exploratorio de los datos, se entrenará un modelo de Random Forest para clasificar jugadores como All-Star o No All-Star y se desarrollará una aplicación Shiny que permita estimar dicha probabilidad de forma interactiva.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Librerías a utilizar</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vip)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="carga-de-datos" class="level3">
+<h3 class="anchored" data-anchor-id="carga-de-datos"><em>2 - Carga de datos</em></h3>
+<p>La base de datos se descargó desde la web de Open ML, desde el siguiente link: <a href="https://www.openml.org/search?type=data&amp;status=active&amp;id=43653" class="uri">https://www.openml.org/search?type=data&amp;status=active&amp;id=43653</a>. Si bien el archivo original es de tipo ARFF, se convirtió a formato CSV para facilitar su manipulación en R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/nba_players.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Estructura de los datos</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Variable =</span> <span class="fu">names</span>(datos),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Tipo =</span> <span class="fu">sapply</span>(datos, class),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Ejemplo =</span> <span class="fu">map_chr</span>(datos, <span class="sc">~</span> <span class="fu">paste</span>(<span class="fu">head</span>(<span class="fu">unique</span>(.x), <span class="dv">3</span>), </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">collapse =</span> <span class="st">", "</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="pxnheqgxpt" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#pxnheqgxpt table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#pxnheqgxpt thead, #pxnheqgxpt tbody, #pxnheqgxpt tfoot, #pxnheqgxpt tr, #pxnheqgxpt td, #pxnheqgxpt th {
+  border-style: none;
+}
+
+#pxnheqgxpt p {
+  margin: 0;
+  padding: 0;
+}
+
+#pxnheqgxpt .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#pxnheqgxpt .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#pxnheqgxpt .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#pxnheqgxpt .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#pxnheqgxpt .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#pxnheqgxpt .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#pxnheqgxpt .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#pxnheqgxpt .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#pxnheqgxpt .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#pxnheqgxpt .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#pxnheqgxpt .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#pxnheqgxpt .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#pxnheqgxpt .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#pxnheqgxpt .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#pxnheqgxpt .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pxnheqgxpt .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#pxnheqgxpt .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#pxnheqgxpt .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#pxnheqgxpt .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pxnheqgxpt .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#pxnheqgxpt .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pxnheqgxpt .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#pxnheqgxpt .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pxnheqgxpt .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#pxnheqgxpt .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#pxnheqgxpt .gt_left {
+  text-align: left;
+}
+
+#pxnheqgxpt .gt_center {
+  text-align: center;
+}
+
+#pxnheqgxpt .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#pxnheqgxpt .gt_font_normal {
+  font-weight: normal;
+}
+
+#pxnheqgxpt .gt_font_bold {
+  font-weight: bold;
+}
+
+#pxnheqgxpt .gt_font_italic {
+  font-style: italic;
+}
+
+#pxnheqgxpt .gt_super {
+  font-size: 65%;
+}
+
+#pxnheqgxpt .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#pxnheqgxpt .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#pxnheqgxpt .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#pxnheqgxpt .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#pxnheqgxpt .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#pxnheqgxpt .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#pxnheqgxpt .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#pxnheqgxpt .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#pxnheqgxpt div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings">
+<th id="Variable" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Variable</th>
+<th id="Tipo" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Tipo</th>
+<th id="Ejemplo" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Ejemplo</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Rk</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">170, 58, 157</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Player.x</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">A.J. Hammons, Aaron Brooks, Aaron Gordon</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Player_ID</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">hammoaj01, brookaa01, gordoaa01</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Pos1</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">C, PG, SF</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Pos2</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, C, SG</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Age</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">24, 32, 21</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Tm</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">DAL, IND, ORL</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">G</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">22, 65, 80</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">GS</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0, 72, 25</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">MP</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">7.4, 13.8, 28.7</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">FG</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.8, 1.9, 4.9</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">FGA</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">1.9, 4.6, 10.8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">FG.</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.405, 0.40299999999999997, 0.45399999999999996</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">X3P</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.2, 0.7, 1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">X3PA</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.5, 2, 3.3</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">X3P.</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.5, 0.375, 0.28800000000000003</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">X2P</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.5, 1.1, 4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">X2PA</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">1.5, 2.6, 7.5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">X2P.</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.375, 0.424, 0.528</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">eFG.</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.46399999999999997, 0.483, 0.499</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">FT</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.4, 0.5, 2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">FTA</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.9, 0.6, 2.7</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">FT.</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.45, 0.8, 0.7190000000000001</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">ORB</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.4, 0.3, 1.5</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">DRB</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">1.3, 0.8, 3.6</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">TRB</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">1.6, 1.1, 5.1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">AST</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.2, 1.9, 0.4</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">STL</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0, 0.4, 0.8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">BLK</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.6, 0.1, 0.5</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">TOV</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">0.5, 1, 1.1</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">PF</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">1, 1.4, 2.2</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">PTS</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">2.2, 5, 12.7</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Salary</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, 2700000.0, 4351320.0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">mean_views</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">3.32, 11.155737704918002, 1713.98633879781</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Season</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">2016-17, 2017-18, 2018-19</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Conference</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">West, Est</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Role</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">Front, Back</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Fvot</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">786, 2474, 22774</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">FRank</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">123, 64, 29</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Pvot</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, 1.0, 7.0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">PRank</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, 52.0, 23.0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Mvot</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, 2.0, 1.0</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">MRank</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">?, 6.0, 8.0</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="Variable">Score</td>
+<td class="gt_row gt_left" headers="Tipo">numeric</td>
+<td class="gt_row gt_left" headers="Ejemplo">83.5, 48.2, 40</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="Variable">Play</td>
+<td class="gt_row gt_left" headers="Tipo">character</td>
+<td class="gt_row gt_left" headers="Ejemplo">No, Yes</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>El dataset cuenta con 45 variables y 1408 observaciones, donde cada observación representa el rendimiento de un jugador en temporada determinada, por lo que cada jugador puede aparecer hasta tres veces en el dataset. A continuación se explican las variables más relevantes:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Player.x</td>
+<td>Nombre del jugador</td>
+</tr>
+<tr class="even">
+<td>Pos1</td>
+<td>Posición</td>
+</tr>
+<tr class="odd">
+<td>G</td>
+<td>Partidos jugados</td>
+</tr>
+<tr class="even">
+<td>MP</td>
+<td>Minutos por partido</td>
+</tr>
+<tr class="odd">
+<td>TRB</td>
+<td>Rebotes por partido</td>
+</tr>
+<tr class="even">
+<td>AST</td>
+<td>Asistencias por partido</td>
+</tr>
+<tr class="odd">
+<td>STL</td>
+<td>Robos por partido</td>
+</tr>
+<tr class="even">
+<td>BLK</td>
+<td>Tapones por partido</td>
+</tr>
+<tr class="odd">
+<td>PTS</td>
+<td>Puntos por partido</td>
+</tr>
+<tr class="even">
+<td>Play</td>
+<td>Indica si el jugador fue All-Star</td>
+</tr>
+<tr class="odd">
+<td>Season</td>
+<td>Temporada</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="análisis-exploratorio-de-los-datos." class="level3">
+<h3 class="anchored" data-anchor-id="análisis-exploratorio-de-los-datos."><em>3 - Análisis exploratorio de los datos.</em></h3>
+<p>Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17 para evitar repetir observaciones de un mismo jugador que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>an_exp <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"2016-17"</span>, G <span class="sc">&gt;=</span> <span class="dv">60</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Player.x, Pos1, G, MP, TRB, AST, STL, BLK, PTS, Play)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Aplicamos los filtros antes mencionados y hacemos una selección de las variable que nos interesaran en el trabajo, tanto en el análisis exploratorio como en el modelo de clasificación. Conservamos las variables PTS, TRB, AST, STL y BLK, que son las 5 estadísticas básicas con las que se suele analizar el rendimiento de un jugador, así como la variable Player.x para poder identificar a los jugadores. Además incluimos las variables G, MP y Pos1, que nos serán de utilidad en el análisis. La variable Play será nuestra variable de respuesta en el modelo, por lo que también la incluimos.</p>
+<p>A continuación se visualizarán algunos gráficos comparando las distintas variables diferenciando si el jugador fue seleccionado como All-Star o no, plasmando las observaciones de forma tanto grupal (boxplot) como individual para así visualizar la variabilidad de los datos.</p>
+<ol type="1">
+<li>¿Los All-Star anotan más?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(an_exp, <span class="fu">aes</span>(<span class="at">x =</span> Play, <span class="at">y =</span> PTS, <span class="at">fill =</span> Play)) <span class="sc">+</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No All-Star"</span>, <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"All-Star"</span>)) <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Puntos por partido según condición de All-Star"</span>, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Puntos por partido"</span>) <span class="sc">+</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"no"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En términos generales se observa que para los jugadores que fueron All-Star se presenta una mayor mediana de puntos por partidos en comparación a aquellos que no lo fueron. La distribución de los valores de quienes fueron seleccionados tiende a tener un desplazamiento hacia valores más altos, lo que sugiere un mayor rendimiento ofensivo en los jugadores. En conjunto el gráfico respalda la existencia de una relación positiva entre la condición de All-Star y un mayor promedio de puntos por partido durante la temporada 2016-17.</p>
+<p>Los jugadores All-Star presentan valores centrales superiores de puntos por partido respecto al resto de jugadores, evidenciando una mayor capacidad ofensiva.</p>
+<ol start="2" type="1">
+<li>¿Los jugadores All-Star participan más del juego colectivo?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(an_exp, <span class="fu">aes</span>(<span class="at">x =</span> Play, <span class="at">y =</span> AST, <span class="at">fill =</span> Play)) <span class="sc">+</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No All-Star"</span>, <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"All-Star"</span>)) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Asistencias por partido según condición de All-Star"</span>, </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Asistencias por partido"</span>) <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"no"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Los jugadores All-Star presentan valores centrales superiores al resto de jugadores con respecto a las asistencias por partido, por lo que podemos afirmar que se relacionan positivamente con la generación de juego y el juego en equipo.</p>
+<p>Tanto en puntos como asistencias podemos ver que la mayoria de los jugadores selecionados al all star se encuentran bastante por enciama de la media de la liga, lo que nos muestra claramente una tendencia a que los All Star se destacan del resto de la liga en el aspecto ofensivo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(an_exp, <span class="fu">aes</span>(<span class="at">x =</span> Play, <span class="at">y =</span> TRB, <span class="at">fill =</span> Play)) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No All-Star"</span>, <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"All-Star"</span>)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Rebotes por partido según condición de All-Star"</span>, </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Rebotes por partido"</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"no"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ol start="3" type="1">
+<li>¿Existe diferencia en la contribución defensiva?</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(an_exp, <span class="fu">aes</span>(<span class="at">x =</span> Play, <span class="at">y =</span> BLK, <span class="at">fill =</span> Play)) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No All-Star"</span>, <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"All-Star"</span>)) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Tapas por partido según condición de All-Star"</span>, </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Tapas por partido"</span>) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"no"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>En las tapas podemos ver que las medianas se encuentran muy cercanas y la mayoria de los All Star se encuentran en el entorno de la mediana del resto de la liga, lo que nos da la pauta de que no es una estadistica tan importante a la hora de ser elegido para el All Star. Sin embargo hay algunos jugadores de los seleccionados al All Star con promedios muy altos de tapones.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(an_exp, <span class="fu">aes</span>(<span class="at">x =</span> Play, <span class="at">y =</span> STL, <span class="at">fill =</span> Play)) <span class="sc">+</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> <span class="fl">0.8</span>, <span class="at">outlier.shape =</span> <span class="cn">NA</span>) <span class="sc">+</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.15</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"No"</span> <span class="ot">=</span> <span class="st">"No All-Star"</span>, <span class="st">"Yes"</span> <span class="ot">=</span> <span class="st">"All-Star"</span>)) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Robos por partido según condición de All-Star"</span>, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">""</span>, <span class="at">y =</span> <span class="st">"Robos por partido"</span>) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"no"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Si bien los valores defensivos son mayores en los jugadores seleccionados All-Star que en los que no lo fueron, la diferencia es menor que en otras variables anteriores. Asi mismo presentan mayor nivel defensivo que aquellos jugadores que no fueron seleccionados.</p>
+<p>A modo de resumen:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>an_exp <span class="sc">|&gt;</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Play) <span class="sc">|&gt;</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="st">'PTS'</span>, <span class="st">'AST'</span>, <span class="st">'TRB'</span>, <span class="st">'BLK'</span>, <span class="st">'STL'</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                   <span class="fu">list</span>(<span class="at">mediana =</span> <span class="sc">~</span><span class="fu">median</span>(.x)))) <span class="sc">|&gt;</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Play</th>
+<th style="text-align: right;">PTS_mediana</th>
+<th style="text-align: right;">AST_mediana</th>
+<th style="text-align: right;">TRB_mediana</th>
+<th style="text-align: right;">BLK_mediana</th>
+<th style="text-align: right;">STL_mediana</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">No</td>
+<td style="text-align: right;">9.2</td>
+<td style="text-align: right;">1.7</td>
+<td style="text-align: right;">3.60</td>
+<td style="text-align: right;">0.4</td>
+<td style="text-align: right;">0.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yes</td>
+<td style="text-align: right;">23.8</td>
+<td style="text-align: right;">5.1</td>
+<td style="text-align: right;">6.25</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">1.3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Si bien a la hora de elegir a un jugador como All Star se basan en un conjunto de variables, cada una de ellas influye de forma diferente. A raíz de estos gráficos podemos afirmar que la variable PTS es en la cual se visualiza mayor diferencia entre un jugador que haya sido All Star y uno que no, las variables AST y TRB presentan diferencias aunque en menor medida, mientras que las variables STL y BLK son las que menos diferencias presentan. En las 5 situaciones la diferencia se visualiza a favor de quienes fueron seleccionados All-Star.</p>
+<p><u><em>Conclusión del análisis exploratorio</em></u></p>
+<p>Este análisis permitió identificar diferencias claras entre jugadores All-Star y no All-Star. Los primeros presentan mayores niveles de producción ofensiva y mejores niveles en distintas estadísticas individuales. Sin embargo la condición All-Star no parece depender de una única variable, sino de una combinación de factores asociados al rendimiento global del jugador.</p>
+</section>
+<section id="limpieza-y-preparación" class="level3">
+<h3 class="anchored" data-anchor-id="limpieza-y-preparación"><em>4 - Limpieza y preparación</em></h3>
+<p>Objetivo: ¿Qué características diferencian a los jugadores All-Star de aquellos que no fueron seleccionados? ¿Podemos encontrar una forma de indicar la probabilidad de que un jugador sea seleccionado All-Star? ¿Podemos predecir que un jugador sea All-Star?</p>
+<p>FOREST</p>
+<p>Preparación de datos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>nba <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(Season <span class="sc">==</span> <span class="st">"2016-17"</span>, G <span class="sc">&gt;=</span> <span class="dv">60</span>) <span class="sc">|&gt;</span>  </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Player.x, TRB, AST, STL, BLK, PTS, Play) <span class="sc">|&gt;</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Play =</span> <span class="fu">as.factor</span>(Play))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Separación de los datos en entrenamiento y testeo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>nba_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(nba, <span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> Play)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>nba_train <span class="ot">&lt;-</span> <span class="fu">training</span>(nba_split)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>nba_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(nba_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Entrenar el modelo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>nba_rf <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">500</span>, <span class="at">min_n =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">'ranger'</span>, <span class="at">importance =</span> <span class="st">'impurity'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">'classification'</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(Play<span class="sc">~</span>., <span class="at">data =</span> nba_train)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>nba_rf <span class="sc">|&gt;</span> <span class="fu">vip</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Quarto-trabajo-final_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>nba_resultados <span class="ot">=</span> nba_train <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Play) <span class="sc">|&gt;</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>(<span class="fu">predict</span>(nba_rf, nba_train)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">.pred_rf =</span> .pred_class)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>nba_resultados <span class="sc">|&gt;</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 2
+  Play  .pred_rf
+  &lt;fct&gt; &lt;fct&gt;   
+1 No    No      
+2 No    No      
+3 No    No      
+4 No    No      
+5 No    No      
+6 No    No      </code></pre>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
