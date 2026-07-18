@@ -6,11 +6,11 @@ editor: visual
 
 ### ***1 - Introducción***
 
-La NBA es la mejor liga de basket del mundo y en lo que ha sido su evolución a lo largo de la historia las estadísticas han jugado un papel muy importante. A dia de hoy las estadisticas son el principal susutento a la hora de tomar decisiones deportivas, buscando maximizar la eficiencia y sacar el máximo provecho de cada jugada. Para esto se hace un relevamiento de cada estadistica, desde las más básicas, como puede ser el conteo de puntos, asistencias y rebotes, hasta las más avanzadas, que pueden incluir calculos matemáticos bastante complejos.
+La NBA es la mejor liga de basket del mundo y en lo que ha sido su evolución a lo largo de la historia las estadísticas han jugado un papel muy importante. A día de hoy las estadísticas son el principal sustento a la hora de tomar decisiones deportivas, buscando maximizar la eficiencia y sacar el máximo provecho de cada jugada. Para esto se hace un relevamiento de cada estadística, desde las más básicas, como puede ser el conteo de puntos, asistencias y rebotes, hasta las más avanzadas, que pueden incluir cálculos matemáticos bastante complejos.
 
-Uno de los grandes momentos de cada temporada de la NBA es juego de las estrellas (All Star Game), que es un partido que se realiza poco después de la mitad de la temporada donde los jugadores que están teniendo una actuación destacada en la temporada son seleccionados para jugar un partido entre ellos. Esto significa un gran logro para cualquier jugador, algunos que ya son habituales en este tipo de partidos, otros son seleccionados para este partido unas pocas veces en su carrera y la gran mayoría jamás llegan a jugar uno. La selección de los jugadores que participan del All Star no es sencilla y se hace a través de cuatro ramas que votan a quienes consideran los mejores: el público, los jugadores y un grupo de periodistas especializados seleccionan a los 5 titulares de cada conferencia, mientras que los siete suplentes de cada equipo son elegidos por votación de todos los entrenadores de la liga.
+Uno de los grandes momentos de cada temporada de la NBA es juego de las estrellas (All Star Game), un partido que se realiza poco después de la mitad de la temporada donde los jugadores que están teniendo una actuación destacada en la temporada son seleccionados para jugar un partido entre ellos. Esto significa un gran logro para cualquier jugador, algunos ya son habituales en este tipo de partidos, otros son seleccionados para este partido unas pocas veces en su carrera y la gran mayoría jamás llegan a jugar uno. La selección de los jugadores que participan del All Star no es sencilla y se hace a través de cuatro ramas que votan a quienes consideran los mejores: el público, los jugadores y un grupo de periodistas especializados seleccionan a los 5 titulares de cada conferencia, mientras que los siete suplentes de cada equipo son elegidos por votación de todos los entrenadores de la liga.
 
-Con este trabajo estudiaremos la relación entre algunas estadisticas individuales y la selección de un jugador para el All Star a través de un modelo de clasificación que permita asignarle a un jugador una probabilidad de ser seleccionado al All Star según sus estadisticas de la temporada. ¿Existe una combinación de estadisticas que permita explicar la selección de un jugador al All Star o influyen otros factores que no tienen que ver con los datos?
+Con este trabajo estudiaremos la relación entre algunas estadísticas individuales y la selección de un jugador para el All Star a través de un modelo de clasificación que permita asignarle a un jugador una probabilidad de ser seleccionado al All Star según sus estadísticas de la temporada. ¿Existe una combinación de estadísticas que permita explicar la selección de un jugador al All Star o influyen otros factores que no tienen que ver con los datos?
 
 Para responder esta pregunta se realizaremos un análisis exploratorio de los datos, se entrenará un modelo de Random Forest para clasificar jugadores como All-Star o No All-Star y se desarrollará una aplicación Shiny que permita estimar dicha probabilidad de forma interactiva.
 
@@ -23,33 +23,32 @@ library(rpart.plot)
 
 ### *2 - Carga de datos*
 
+La base de datos se descargó desde la web de Open ML, desde el siguiente link: <https://www.openml.org/search?type=data&status=active&id=43653>. Si bien el archivo original es de tipo ARFF, se convirtió a formato CSV para facilitar su manipulación en R..
+
 ```{r}
 datos <- read_csv("data/nba_players.csv")
 ```
 
-### *3 - Exploracion inicial de los datos*
+El dataset cuenta con 1408 observaciones, cada observación representa el rendimiento de un jugador en una temporada determinada, por lo que cada jugador puede aparecer hasta tres veces en el dataset, y 45 variables, a continuación se explican las más relevantes:
+
+| Variable | Descripción                       |
+|----------|-----------------------------------|
+| Player.x | Nombre del jugador                |
+| Pos1     | Posición                          |
+| G        | Partidos jugados                  |
+| MP       | Minutos por partido               |
+| TRB      | Rebotes por partido               |
+| AST      | Asistencias por partido           |
+| STL      | Robos por partido                 |
+| BLK      | Tapones por partido               |
+| PTS      | Puntos por partido                |
+| Play     | Indica si el jugador fue All-Star |
+| Season   | Temporada                         |
+
+### *3 - Análisis exploratorio de los datos.* 
+
+Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17, para evitar repetir observaciones de un mismo jugador, que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, excluyendo a los jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.
 
 ```{r}
-glimpse(datos)
+temp16_17 <- datos %>% filter(Season == "2016-17", G >= 60)
 ```
-
-```{r}
-summary(datos)
-```
-
-```{r}
-stats5 <- datos %>% 
-  select(PTS, TRB, AST, STL, BLK)
-```
-
-### *4 - Limpieza y preparación*
-
-### 
-
-*5 - Análisis descriptivo*
-
-### *6 - Modelos predictivos*
-
-### *7 - Evaluación de modelos*
-
-### *8 - Conclusiones*
