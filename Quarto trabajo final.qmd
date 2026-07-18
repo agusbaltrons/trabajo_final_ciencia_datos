@@ -19,6 +19,7 @@ library(tidyverse)
 library(ggplot2)
 library(rpart)
 library(rpart.plot)
+library(plotly)
 ```
 
 ### *2 - Carga de datos*
@@ -45,10 +46,66 @@ El dataset cuenta con 1408 observaciones, cada observación representa el rendim
 | Play     | Indica si el jugador fue All-Star |
 | Season   | Temporada                         |
 
-### *3 - Análisis exploratorio de los datos.* 
+### *3 - Análisis exploratorio de los datos.*
 
 Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17, para evitar repetir observaciones de un mismo jugador, que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, excluyendo a los jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.
 
 ```{r}
-temp16_17 <- datos %>% filter(Season == "2016-17", G >= 60)
+an_exp <- datos %>% 
+  filter(Season == "2016-17", G >= 60) %>% 
+  select(Player.x, Pos1, G, MP, TRB, AST, STL, BLK, PTS, Play)
 ```
+
+Aplicamos los filtros antes mencionados y hacemos una selección de las variable que nos interesaran en el trabajo, tanto en el análisis exploratorio como en el modelo de clasificación. Conservamos las variables PTS, TRB, AST, STL y BLK, que son las 5 estadísticas básicas con las que se suele analizar el rendimiento de un jugador, así como la variable Player.x para poder identificar a los jugadores. Además incluimos las variables G, MP y Pos1, que nos serán de utilidad en el análisis. La variable Play será nuestra variable de respuesta en el modelo, asi que también la incluimos.
+
+```{r}
+ggplot(an_exp, aes(x = Play, y = PTS, fill = Play)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
+  labs(title = "Puntos por partido según condición de All-Star", x = "", y = "Puntos por partido") +
+  theme_classic() +
+  theme(legend.position = "no")
+```
+
+```{r}
+ggplot(an_exp, aes(x = Play, y = AST, fill = Play)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
+  labs(title = "Asistencias por partido según condición de All-Star", x = "", y = "Asistencias por partido") +
+  theme_classic() +
+  theme(legend.position = "no")
+```
+
+```{r}
+ggplot(an_exp, aes(x = Play, y = TRB, fill = Play)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
+  labs(title = "Rebotes por partido según condición de All-Star", x = "", y = "Rebotes por partido") +
+  theme_classic() +
+  theme(legend.position = "no")
+```
+
+```{r}
+ggplot(an_exp, aes(x = Play, y = BLK, fill = Play)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
+  labs(title = "Tapas por partido según condición de All-Star", x = "", y = "Tapas por partido") +
+  theme_classic() +
+  theme(legend.position = "no")
+```
+
+```{r}
+ggplot(an_exp, aes(x = Play, y = STL, fill = Play)) +
+  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
+  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
+  labs(title = "Robos por partido según condición de All-Star", x = "", y = "Robos por partido") +
+  theme_classic() +
+  theme(legend.position = "no")
+```
+
+-   interpretación a cada grafico y tratar de agregar el plotly
