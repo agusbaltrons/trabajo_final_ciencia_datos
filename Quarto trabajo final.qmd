@@ -37,8 +37,9 @@ La base de datos se descargó desde la web de Open ML, desde el siguiente link: 
 datos <- read_csv("data/nba_players.csv")
 ```
 
+#### *Estructura de los datos.*
+
 ```{r}
-#Estructura de los datos
 tibble(
   Variable = names(datos),
   Tipo = sapply(datos, class),
@@ -101,7 +102,7 @@ ggplot(an_exp, aes(x = Play, fill = Play)) +
   )
 ```
 
-1.  Los All-Star anotan más?
+#### *¿Los All Star anotan más?*
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = PTS, fill = Play)) +
@@ -118,7 +119,7 @@ En términos generales se observa que para los jugadores que fueron All-Star se 
 
 Los jugadores All-Star presentan valores centrales superiores de puntos por partido respecto al resto de jugadores, evidenciando una mayor capacidad ofensiva.
 
-2.  ¿Los jugadores All-Star participan más del juego colectivo?
+#### *¿Los jugadores All-Star participan más del juego colectivo?*
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = AST, fill = Play)) +
@@ -148,7 +149,7 @@ ggplot(an_exp, aes(x = Play, y = TRB, fill = Play)) +
 
 En cuanto a los rebotesb tambien podemos ver que los All Star tienen estadisticas superiores en general, pero no es tan marcadocomo en puntos y asistencias, incluso ambos boxplots llegan a superponerse. Si bien los rebotes contribuyen al rendimiento del jugador, no parecen ser tan determinantes como las estadisticas anteriores.
 
-3.  ¿Existe diferencia en la contribución defensiva?
+#### *¿Existe diferencia en la contribución defensiva?*
 
 ```{r}
 ggplot(an_exp, aes(x = Play, y = BLK, fill = Play)) +
@@ -176,7 +177,7 @@ ggplot(an_exp, aes(x = Play, y = STL, fill = Play)) +
 
 Si bien los valores defensivos son mayores en los jugadores seleccionados All-Star que en los que no lo fueron, la diferencia es menor que en otras variables anteriores. Así mismo presentan mayor nivel defensivo que aquellos jugadores que no fueron seleccionados.
 
-A modo de resumen:
+#### *A modo de resumen:*
 
 ```{r}
 an_exp |>
@@ -188,7 +189,7 @@ an_exp |>
 
 Si bien a la hora de elegir a un jugador como All Star se basan en un conjunto de variables, cada una de ellas influye de forma diferente. A raíz de estos gráficos podemos afirmar que la variable PTS es en la cual se visualiza mayor diferencia entre un jugador que haya sido All Star y uno que no, las variables AST y TRB presentan diferencias aunque en menor medida, mientras que las variables STL y BLK son las que menos diferencias presentan. En las 5 situaciones la diferencia se visualiza a favor de quienes fueron seleccionados All-Star.
 
-[*Conclusión del análisis exploratorio*]{.underline}
+#### [*Conclusión del análisis exploratorio*]{.underline}
 
 Este análisis permitió identificar diferencias claras entre jugadores All-Star y no All-Star. Los primeros presentan mayores niveles de producción ofensiva y mejores niveles en distintas estadísticas individuales. Sin embargo la condición All-Star no parece depender de una única variable, sino de una combinación de factores asociados al rendimiento global del jugador.
 
@@ -196,7 +197,7 @@ Este análisis permitió identificar diferencias claras entre jugadores All-Star
 
 El objetivo de el modelo será predecir si un jugador será All Star o no, según sus estadísticas individuales. Para ello se realizará un random forest, aprovechando las estadísticas de las tres temporadas que tenemos disponibles.
 
-*Preparación de datos.*
+#### *Preparación de datos.*
 
 ```{r}
 datos_rf <- datos %>%
@@ -205,7 +206,7 @@ datos_rf <- datos %>%
   mutate(Play = as.factor(Play))
 ```
 
-*Separación de los datos en entrenamiento (80%) y testeo (20%).*
+#### *Separación de los datos en entrenamiento (80%) y testeo (20%).*
 
 ```{r}
 set.seed(123)
@@ -214,7 +215,7 @@ nba_train <- training(nba_split)
 nba_test <- testing(nba_split)
 ```
 
-*Entrenamos el modelo con los datos de train y hacemos la gráfica que indica que variable es más importante.*
+#### *Entrenamos el modelo con los datos de train y hacemos la gráfica que indica que variable es más importante.*
 
 ```{r}
 nba_rf <- rand_forest(trees = 500, min_n = 5) |> 
@@ -224,7 +225,7 @@ nba_rf <- rand_forest(trees = 500, min_n = 5) |>
 nba_rf |> vip()
 ```
 
-*Predecimos sobre los datos de test.*
+#### *Predecimos sobre los datos de test.*
 
 ```{r}
 nba_resultados = nba_test |> 
@@ -235,7 +236,7 @@ nba_resultados = nba_test |>
 nba_resultados %>% head()
 ```
 
-*Realizamos la matriz de confusión.*
+#### *Realizamos la matriz de confusión.*
 
 ```{r}
 nba_resultados |>
@@ -244,7 +245,7 @@ nba_resultados |>
 
 La matriz de confusion muestra que la predicción sobre los datos de test arrojó como resultado 132 verdaderos negativos, 11 verdaderos positivos, 5 falsos positivos y 1 falso negativo. El modelo casi no se equivoca con los jugadores que no fueron All Star, pero si tiene una mayor tendencia a equivocarse con aquellos jugadores que si fueron All star.
 
-*Calculamos las métricas de nuestro modelo.*
+#### *Calculamos las métricas de nuestro modelo.*
 
 ```{r}
 bind_rows(
@@ -256,8 +257,20 @@ bind_rows(
 ```
 
 | Métrica   | Valor | Interpretación                                                                                     |
-|-----------|-------|----------------------------------------------------------------------------------------------------|
+|-----------|-----------|---------------------------------------------------|
 | Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
 | Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
 | Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
 | F1-score  | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
+
+#### *Calculo de probabilidades de que un jugador sea All Star.*
+
+Además de clasificar a los jugadores como All Star o No All Star, el modelo también permite estimar las probabilidades de que un jugador sea seleccionado al All Star. A continuación se desarrollara una aplicación Shiny aprovechando esta caracteristica.
+
+```{r}
+nba_prob <- nba_test |>
+  select(Play) |>
+  bind_cols(predict(nba_rf, nba_test, type = "prob"))
+
+head(nba_prob)
+```
