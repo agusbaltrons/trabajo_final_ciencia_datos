@@ -192,31 +192,29 @@ Si bien a la hora de elegir a un jugador como All Star se basan en un conjunto d
 
 Este análisis permitió identificar diferencias claras entre jugadores All-Star y no All-Star. Los primeros presentan mayores niveles de producción ofensiva y mejores niveles en distintas estadísticas individuales. Sin embargo la condición All-Star no parece depender de una única variable, sino de una combinación de factores asociados al rendimiento global del jugador.
 
-### *4 - Limpieza y preparación*
+### *4 - Construcción del modelo de clasificación.*
 
-Objetivo: ¿Qué características diferencian a los jugadores All-Star de aquellos que no fueron seleccionados? ¿Podemos encontrar una forma de indicar la probabilidad de que un jugador sea seleccionado All-Star? ¿Podemos predecir que un jugador sea All-Star?
+El objetivo de el modelo será predecir si un jugador será All Star o no, según sus estadísticas individuales. Para ello se realizará un random forest, aprovechando las estadísticas de las tres temporadas que tenemos disponibles.
 
-FOREST
-
-Preparación de datos.
+*Preparación de datos.*
 
 ```{r}
-nba <- datos %>% 
-  filter(Season == "2016-17", G >= 60) |>  
-  select(Player.x, TRB, AST, STL, BLK, PTS, Play) |> 
+datos_rf <- datos %>%
+  filter(G >= 60) %>% 
+  select(TRB, AST, STL, BLK, PTS, Play) |> 
   mutate(Play = as.factor(Play))
 ```
 
-Separación de los datos en entrenamiento y testeo.
+*Separación de los datos en entrenamiento (80%) y testeo (20%).*
 
 ```{r}
 set.seed(123)
-nba_split <- initial_split(nba, prop = 0.8, strata = Play)
+nba_split <- initial_split(datos_rf, prop = 0.8, strata = Play)
 nba_train <- training(nba_split)
 nba_test <- testing(nba_split)
 ```
 
-Entrenar el modelo.
+*Entrenamos el modelo con los datos de train y hacemos la gráfica que indica que variable es más importante.*
 
 ```{r}
 nba_rf <- rand_forest(trees = 500, min_n = 5) |> 
@@ -226,11 +224,40 @@ nba_rf <- rand_forest(trees = 500, min_n = 5) |>
 nba_rf |> vip()
 ```
 
+*Predecimos sobre los datos de test.*
+
 ```{r}
-nba_resultados = nba_train |> 
+nba_resultados = nba_test |> 
   select(Play) |> 
-  bind_cols(predict(nba_rf, nba_train)) |> 
+  bind_cols(predict(nba_rf, nba_test))|> 
   rename(.pred_rf = .pred_class)
 
-nba_resultados |> head()
+nba_resultados %>% head()
 ```
+
+*Realizamos la matriz de confusión.*
+
+```{r}
+nba_resultados |>
+  conf_mat(truth = Play, estimate = .pred_rf)
+```
+
+La matriz de confusion muestra que la predicción sobre los datos de test arrojó como resultado 132 verdaderos negativos, 11 verdaderos positivos, 5 falsos positivos y 1 falso negativo. El modelo casi no se equivoca con los jugadores que no fueron All Star, pero si tiene una mayor tendencia a equivocarse con aquellos jugadores que si fueron All star.
+
+*Calculamos las métricas de nuestro modelo.*
+
+```{r}
+bind_rows(
+  accuracy(nba_resultados, truth = Play, estimate = .pred_rf),
+  precision(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second"),
+  recall(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second"),
+  f_meas(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second")
+)
+```
+
+| Métrica   | Valor | Interpretación                                                                                     |
+|-----------|-------|----------------------------------------------------------------------------------------------------|
+| Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
+| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
+| Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
+| F1-score  | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
