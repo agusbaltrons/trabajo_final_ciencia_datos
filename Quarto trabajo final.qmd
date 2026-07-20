@@ -183,7 +183,8 @@ Si bien los valores defensivos son mayores en los jugadores seleccionados All-St
 an_exp |>
   group_by(Play) |>
   summarise(across(c(PTS, AST, TRB, BLK, STL), 
-                   list(Media = ~ round(mean(.x), 2), Mediana = median))) %>% 
+                   list(Media = ~ round(mean(.x), 2), 
+                        Mediana = ~median(.x)))) %>% 
   kable()
 ```
 
@@ -233,7 +234,7 @@ nba_resultados = nba_test |>
   bind_cols(predict(nba_rf, nba_test))|> 
   rename(.pred_rf = .pred_class)
 
-nba_resultados %>% head()
+kable(head(nba_resultados))
 ```
 
 #### *Realizamos la matriz de confusión.*
@@ -243,25 +244,28 @@ nba_resultados |>
   conf_mat(truth = Play, estimate = .pred_rf)
 ```
 
-La matriz de confusion muestra que la predicción sobre los datos de test arrojó como resultado 132 verdaderos negativos, 11 verdaderos positivos, 5 falsos positivos y 1 falso negativo. El modelo casi no se equivoca con los jugadores que no fueron All Star, pero si tiene una mayor tendencia a equivocarse con aquellos jugadores que si fueron All star.
+La matriz de confusión muestra que la predicción sobre los datos de test arrojó como resultado 132 verdaderos negativos, 11 verdaderos positivos, 5 falsos positivos y 1 falso negativo. El modelo casi no se equivoca con los jugadores que no fueron All Star, pero si tiene una mayor tendencia a equivocarse con aquellos jugadores que si fueron All star.
 
 #### *Calculamos las métricas de nuestro modelo.*
 
 ```{r}
 bind_rows(
   accuracy(nba_resultados, truth = Play, estimate = .pred_rf),
-  precision(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second"),
-  recall(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second"),
-  f_meas(nba_resultados, truth = Play, estimate = .pred_rf, event_level = "second")
+  precision(nba_resultados, truth = Play, 
+            estimate = .pred_rf, event_level = "second"),
+  recall(nba_resultados, truth = Play, 
+         estimate = .pred_rf, event_level = "second"),
+  f_meas(nba_resultados, truth = Play, 
+         estimate = .pred_rf, event_level = "second")
 )
 ```
 
-| Métrica   | Valor | Interpretación                                                                                     |
-|-----------|-----------|---------------------------------------------------|
-| Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
-| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
-| Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
-| F1-score  | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
+| Métrica | Valor | Interpretación |
+|--------------|--------------|--------------------------------------------|
+| Accuracy | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba. |
+| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran. |
+| Recall | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star. |
+| F1-score | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
 
 #### *Calculo de probabilidades de que un jugador sea All Star.*
 
