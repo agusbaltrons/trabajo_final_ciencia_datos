@@ -6,7 +6,7 @@ editor: visual
 
 ### ***1 - Introducción***
 
-La NBA es la mejor liga de basket del mundo y en lo que ha sido su evolución a lo largo de la historia las estadísticas han jugado un papel muy importante. A día de hoy las estadísticas son el principal sustento a la hora de tomar decisiones deportivas, buscando maximizar la eficiencia y sacar el máximo provecho de cada jugada. Para esto se hace un relevamiento de cada estadística, desde las más básicas, como puede ser el conteo de puntos, asistencias y rebotes, hasta las más avanzadas, que pueden incluir cálculos matemáticos bastante complejos.
+La NBA es la mejor liga de basket del mundo y en lo que ha sido su evolución a lo largo de la historia las estadísticas han jugado un papel muy importante. A día de hoy las estadísticas son el principal sustento a la hora de tomar decisiones deportivas, buscando maximizar la eficiencia y sacar el máximo provecho de cada jugada. Para esto se hace un relevamiento de cada estadística, desde las más básicas, como puede ser el conteo de puntos, asistencias y rebotes, hasta las más avanzadas, que pueden incluir cálculos matemáticos complejos.
 
 Uno de los grandes momentos de cada temporada de la NBA es juego de las estrellas (All Star Game), un partido que se realiza poco después de la mitad de la temporada donde los jugadores que están teniendo una actuación destacada en la temporada son seleccionados para jugar un partido entre ellos. Esto significa un gran logro para cualquier jugador, algunos ya son habituales en este tipo de partidos, otros son seleccionados para este partido unas pocas veces en su carrera y la gran mayoría jamás llegan a jugar uno. La selección de los jugadores que participan del All Star no es sencilla y se hace a través de cuatro ramas que votan a quienes consideran los mejores: el público, los jugadores y un grupo de periodistas especializados seleccionan a los 5 titulares de cada conferencia, mientras que los siete suplentes de cada equipo son elegidos por votación de todos los entrenadores de la liga.
 
@@ -257,7 +257,7 @@ bind_rows(
 ```
 
 | Métrica   | Valor | Interpretación                                                                                     |
-|-----------|-------|----------------------------------------------------------------------------------------------------|
+|-----------|-----------|---------------------------------------------------|
 | Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
 | Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
 | Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
