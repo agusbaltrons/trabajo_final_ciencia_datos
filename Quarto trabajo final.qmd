@@ -257,7 +257,7 @@ bind_rows(
 ```
 
 | Métrica   | Valor | Interpretación                                                                                     |
-|-----------|-----------|---------------------------------------------------|
+|-----------|-------|----------------------------------------------------------------------------------------------------|
 | Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
 | Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
 | Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
