@@ -32,7 +32,7 @@ library(vip)
 
 ### *2 - Carga de datos*
 
-La base de datos se descargó desde la web de Open ML, desde el siguiente link: <https://www.openml.org/search?type=data&status=active&id=43653>. \
+La base de datos se descargó desde la web de Open ML, desde el siguiente link: <https://www.openml.org/search?type=data&status=active&id=43653>.\
 Si bien el archivo original es de tipo ARFF, se convirtió a formato CSV para facilitar su manipulación en R.
 
 ```{r, warning=FALSE, message=FALSE}
@@ -282,12 +282,12 @@ bind_rows(
   kable()
 ```
 
-| Métrica | Valor | Interpretación |
-|--------------|--------------|--------------------------------------------|
-| Accuracy | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba. |
-| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran. |
-| Recall | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star. |
-| F1-score | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
+| Métrica   | Valor | Interpretación                                                                                     |
+|----------------|----------------|-----------------------------------------|
+| Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
+| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
+| Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
+| F1-score  | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
 
 #### *Calculo de probabilidades de que un jugador sea All Star.*
 
@@ -326,4 +326,8 @@ ggplot(prueba, aes(x = Play, y = PTS, fill = Play)) +
     x = "", y = "Puntos por partido") +
   theme_classic() +
   theme(legend.position = "no")
+```
+
+```{r}
+saveRDS(nba_rf, "nba_rf.rds")
 ```

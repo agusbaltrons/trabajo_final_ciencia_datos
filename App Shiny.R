@@ -1,5 +1,8 @@
 #LIBRERIAS
 library(shiny)
+library(tidyverse)
+
+nba_rf <- readRDS("nba_rf.rds")
 
 ui <- fluidPage(
   titlePanel("Predicción de selección al All Star"),
@@ -14,16 +17,41 @@ ui <- fluidPage(
     actionButton("predecir", 
                  "Calcular probabilidad")),
   mainPanel(h2("Probabilidad de ser All-Star"),
-    h1("—"),
+    h1(textOutput("probabilidad")),
     br(),
     h2("Clasificación estimada"),
-    h2("—"))
+    h2(textOutput("clasificacion")))
   )
 )
 
-
-server <- function(input,output){}
-
+server <- function(input, output) {
+  observeEvent(input$predecir, {
+    nuevo_jugador <- tibble(
+      TRB = input$TRB,
+      AST = input$AST,
+      STL = input$STL,
+      BLK = input$BLK,
+      PTS = input$PTS)
+    probabilidad <- predict(
+      nba_rf,
+      new_data = nuevo_jugador,
+      type = "prob")
+    output$probabilidad <- renderText({
+      paste0(round(probabilidad$.pred_Yes * 100, 1), "%")
+    })
+    clase <- predict(
+      nba_rf,
+      new_data = nuevo_jugador,
+      type = "class")
+    output$clasificacion <- renderText({
+      if (clase$.pred_class == "Yes") {
+        "All-Star"
+      } else {
+        "No All-Star"
+      }
+    })
+    })
+  }
 
 
 shinyApp(ui, server)
