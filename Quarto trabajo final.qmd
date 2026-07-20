@@ -283,7 +283,7 @@ bind_rows(
 ```
 
 | Métrica   | Valor | Interpretación                                                                                     |
-|----------------|----------------|-----------------------------------------|
+|-----------------|-----------------|--------------------------------------|
 | Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
 | Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
 | Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
@@ -301,7 +301,17 @@ nba_prob <- nba_test |>
 head(nba_prob) |> kable()
 ```
 
-### *5 - Conclusiones*
+### *5 - Aplicación Shiny*
+
+En base a el modelo realizado anteriormente se desarrollará una aplicación Shiny, la cual servirá para predecir la probabilidad de que un jugador sea seleccionado al All Star o no, en función de de sus promedios por partido de puntos, asistencias, rebotes, robos y tapas. la shiny usara el modelo de random forest que entrenamos para realizar las predicciones.
+
+```{r}
+saveRDS(nba_rf, "nba_rf.rds")
+```
+
+Esta linea de codigo anterior sirve para vincular nuestro modelo a la aplicación, sin necesidad de correr todo el código del Random Forest previamente.
+
+### *6 - Conclusiones*
 
 A raíz de lo presentado podemos concluir que el modelo predice con bajo margen de error si un jugador llega a ser All-Star o no.
 
@@ -326,8 +336,4 @@ ggplot(prueba, aes(x = Play, y = PTS, fill = Play)) +
     x = "", y = "Puntos por partido") +
   theme_classic() +
   theme(legend.position = "no")
-```
-
-```{r}
-saveRDS(nba_rf, "nba_rf.rds")
 ```
