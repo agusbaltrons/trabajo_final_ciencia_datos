@@ -46,7 +46,7 @@ tibble(
   Variable = names(datos),
   Tipo = sapply(datos, class),
   Ejemplo = map_chr(datos, ~ paste(head(unique(.x), 4), 
-                                   collapse = ", "))) %>%
+                                   collapse = ", "))) |> 
   gt()
 ```
 
@@ -71,8 +71,8 @@ El dataset cuenta con 45 variables y 1408 observaciones, donde cada observación
 Para realizar el análisis exploratorio solo usaremos los datos de la temporada 2016-17 para evitar repetir observaciones de un mismo jugador que pueden ser muy similares entre una temporada y otra. También excluiremos a los jugadores que hayan jugado menos de 60 partidos, jugadores con escasa participación, ya que sus promedios podrían no ser representativos de su verdadero rendimiento.
 
 ```{r}
-an_exp <- datos %>% 
-  filter(Season == "2016-17", G >= 60) %>% 
+an_exp <- datos |> 
+  filter(Season == "2016-17", G >= 60) |> 
   select(Player.x, Pos1, G, MP, TRB, AST, STL, BLK, PTS, Play)
 ```
 
@@ -89,27 +89,28 @@ ggplot(an_exp, aes(x = Play, fill = Play)) +
   geom_text(
     stat = "count",
     aes(label = after_stat(count)),
-    vjust = -0.3
-  ) +
+    vjust = -0.3) +
   scale_x_discrete(labels = c("No" = "No All-Star",
                               "Yes" = "All-Star")) +
-  labs(
-    title = "Cantidad de jugadores según condición de All-Star",
-    x = "",
-    y = "Cantidad de jugadores"
-  ) +
+  labs(title = "Cantidad de jugadores según condición de All-Star",
+       x = "", y = "Cantidad de jugadores") +
   theme_classic() +
-  theme(
-    legend.position = "none",
-    plot.title = element_text(hjust = 0.5)
-  )
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "italic"))
 ```
 
 #### *¿Los All Star anotan más?*
 
 ```{r}
 #| code-fold: true
-ggplot(an_exp, aes(x = Play, y = PTS, fill = Play)) +
+gPTS <- ggplot(an_exp, aes(x = Play, y = PTS, fill = Play,
+                           text = paste0("Jugador: ", Player.x,
+                                         "<br>Puntos: ", PTS,
+                                         "<br>Asistencias: ", AST,
+                                         "<br>Rebotes: ", TRB,
+                                         "<br>Robos: ", STL,
+                                         "<br>Tapas: ", BLK))) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
@@ -118,18 +119,25 @@ ggplot(an_exp, aes(x = Play, y = PTS, fill = Play)) +
   theme_classic() +
   theme(legend.position = "no",
         plot.title = element_text(hjust = 0.5,
-                                  face = "bold.italic"))
+                                  face = "italic"))
+
+ggplotly(gPTS, tooltip = "text") |>
+  layout(showlegend = FALSE)
 ```
 
 En términos generales se observa que para los jugadores que fueron All-Star se presenta una mayor mediana de puntos por partidos en comparación a aquellos que no lo fueron. La distribución de los valores de quienes fueron seleccionados tiende a tener un desplazamiento hacia valores más altos, lo que sugiere un mayor rendimiento ofensivo en los jugadores. En conjunto el gráfico respalda la existencia de una relación positiva entre la condición de All-Star y un mayor promedio de puntos por partido durante la temporada 2016-17.
-
-Los jugadores All-Star presentan valores centrales superiores de puntos por partido respecto al resto de jugadores, evidenciando una mayor capacidad ofensiva.
 
 #### *¿Los jugadores All-Star participan más del juego colectivo?*
 
 ```{r}
 #| code-fold: true
-ggplot(an_exp, aes(x = Play, y = AST, fill = Play)) +
+gAST <- ggplot(an_exp, aes(x = Play, y = AST, fill = Play,
+                           text = paste0("Jugador: ", Player.x,
+                                         "<br>Puntos: ", PTS,
+                                         "<br>Asistencias: ", AST,
+                                         "<br>Rebotes: ", TRB,
+                                         "<br>Robos: ", STL,
+                                         "<br>Tapas: ", BLK))) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
@@ -139,52 +147,88 @@ ggplot(an_exp, aes(x = Play, y = AST, fill = Play)) +
   theme(legend.position = "no",
         plot.title = element_text(hjust = 0.5,
                                   face = "italic"))
+
+ggplotly(gAST, tooltip = "text") |>
+  layout(showlegend = FALSE)
 ```
 
 Los jugadores All-Star presentan valores centrales superiores al resto de jugadores con respecto a las asistencias por partido, por lo que podemos afirmar que se relacionan positivamente con la generación de juego y el juego en equipo.
 
-Tanto en puntos como asistencias podemos ver que la mayoria de los jugadores selecionados al all star se encuentran bastante por enciama de la media de la liga, lo que nos muestra claramente una tendencia a que los All Star se destacan del resto de la liga en el aspecto ofensivo.
+Tanto en puntos como asistencias podemos ver que la mayoria de los jugadores seleccionados al all star se encuentran bastante por enciama de la media de la liga, lo que nos muestra claramente una tendencia a que los All Star se destacan del resto de la liga en el aspecto ofensivo.
 
 ```{r}
 #| code-fold: true
-ggplot(an_exp, aes(x = Play, y = TRB, fill = Play)) +
+gTRB <- ggplot(an_exp, aes(x = Play, y = TRB, fill = Play, 
+                           text = paste0("Jugador: ", Player.x,
+                                         "<br>Puntos: ", PTS,
+                                         "<br>Asistencias: ", AST,
+                                         "<br>Rebotes: ", TRB,
+                                         "<br>Robos: ", STL,
+                                         "<br>Tapas: ", BLK))) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
   labs(title = "Rebotes por partido según condición de All-Star", 
        x = "", y = "Rebotes por partido") +
   theme_classic() +
-  theme(legend.position = "no")
+  theme(legend.position = "no",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "italic"))
+
+ggplotly(gTRB, tooltip = "text") |>
+  layout(showlegend = FALSE)
 ```
 
-En cuanto a los rebotesb tambien podemos ver que los All Star tienen estadisticas superiores en general, pero no es tan marcadocomo en puntos y asistencias, incluso ambos boxplots llegan a superponerse. Si bien los rebotes contribuyen al rendimiento del jugador, no parecen ser tan determinantes como las estadisticas anteriores.
+En cuanto a los rebotes tambien podemos ver que los All Star tienen estadísticas superiores en general, pero no es tan marcado como en puntos y asistencias, incluso ambos boxplots llegan a superponerse. Si bien los rebotes contribuyen al rendimiento del jugador, no parecen ser tan determinantes como las estadísticas anteriores.
 
 #### *¿Existe diferencia en la contribución defensiva?*
 
 ```{r}
 #| code-fold: true
-ggplot(an_exp, aes(x = Play, y = BLK, fill = Play)) +
+gBLK <- ggplot(an_exp, aes(x = Play, y = BLK, fill = Play,
+                           text = paste0("Jugador: ", Player.x,
+                                         "<br>Puntos: ", PTS,
+                                         "<br>Asistencias: ", AST,
+                                         "<br>Rebotes: ", TRB,
+                                         "<br>Robos: ", STL,
+                                         "<br>Tapas: ", BLK))) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
   labs(title = "Tapas por partido según condición de All-Star", 
        x = "", y = "Tapas por partido") +
   theme_classic() +
-  theme(legend.position = "no")
+  theme(legend.position = "no",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "italic"))
+
+ggplotly(gBLK, tooltip = "text") |>
+  layout(showlegend = FALSE)
 ```
 
 En las tapas podemos ver que las medianas se encuentran muy cercanas y la mayoría de los All Star se encuentran en el entorno de la mediana del resto de la liga, lo que nos da la pauta de que no es una estadística tan importante a la hora de ser elegido para el All Star. Sin embargo hay algunos jugadores de los seleccionados al All Star con promedios muy altos de tapones.
 
 ```{r}
 #| code-fold: true
-ggplot(an_exp, aes(x = Play, y = STL, fill = Play)) +
+gSTL <- ggplot(an_exp, aes(x = Play, y = STL, fill = Play,
+                           text = paste0("Jugador: ", Player.x,
+                                         "<br>Puntos: ", PTS,
+                                         "<br>Asistencias: ", AST,
+                                         "<br>Rebotes: ", TRB,
+                                         "<br>Robos: ", STL,
+                                         "<br>Tapas: ", BLK))) +
   geom_boxplot(alpha = 0.8, outlier.shape = NA) +
   geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
   scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
   labs(title = "Robos por partido según condición de All-Star", 
        x = "", y = "Robos por partido") +
   theme_classic() +
-  theme(legend.position = "no")
+  theme(legend.position = "no",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "italic"))
+
+ggplotly(gSTL, tooltip = "text") |>
+  layout(showlegend = FALSE)
 ```
 
 Si bien los valores defensivos son mayores en los jugadores seleccionados All-Star que en los que no lo fueron, la diferencia es menor que en otras variables anteriores. Así mismo presentan mayor nivel defensivo que aquellos jugadores que no fueron seleccionados.
@@ -196,7 +240,7 @@ an_exp |>
   group_by(Play) |>
   summarise(across(c(PTS, AST, TRB, BLK, STL), 
                    list(Media = ~ round(mean(.x), 2), 
-                        Mediana = ~median(.x)))) %>% 
+                        Mediana = ~ median(.x)))) |>  
   kable()
 ```
 
@@ -213,8 +257,8 @@ El objetivo de el modelo será predecir si un jugador será All Star o no, segú
 #### *Preparación de datos.*
 
 ```{r}
-datos_rf <- datos %>%
-  filter(G >= 60) %>% 
+datos_rf <- datos |> 
+  filter(G >= 60) |>  
   select(TRB, AST, STL, BLK, PTS, Play) |> 
   mutate(Play = as.factor(Play))
 ```
@@ -235,10 +279,16 @@ nba_rf <- rand_forest(trees = 500, min_n = 5) |>
   set_engine('ranger', importance = 'impurity') |> 
   set_mode('classification') |> 
   fit(Play~., data = nba_train)
-nba_rf |> vip()
+nba_rf |> 
+  vip() + 
+  geom_col(fill = "#00BFC4") +
+  theme_classic() +
+  theme(legend.position = "no",
+        plot.title = element_text(hjust = 0.5,
+                                  face = "italic"))
 ```
 
-#### *Predecimos sobre los datos de test.*
+#### *Predecimos sobre los datos de test.* 
 
 ```{r}
 nba_resultados = nba_test |> 
@@ -262,7 +312,7 @@ nba_resultados |>
   theme_classic() +
   theme(legend.position = "no",
         plot.title = element_text(hjust = 0.5,
-                                  face = "bold.italic"))
+                                  face = "italic"))
 ```
 
 La matriz de confusión muestra que la predicción sobre los datos de test arrojó como resultado 132 verdaderos negativos, 11 verdaderos positivos, 5 falsos positivos y 1 falso negativo. El modelo casi no se equivoca con los jugadores que no fueron All Star, pero si tiene una mayor tendencia a equivocarse con aquellos jugadores que si fueron All star.
@@ -270,6 +320,7 @@ La matriz de confusión muestra que la predicción sobre los datos de test arroj
 #### *Calculamos las métricas de nuestro modelo.*
 
 ```{r}
+#| code-fold: true
 bind_rows(
   accuracy(nba_resultados, truth = Play, estimate = .pred_rf),
   precision(nba_resultados, truth = Play, 
@@ -277,21 +328,20 @@ bind_rows(
   recall(nba_resultados, truth = Play, 
          estimate = .pred_rf, event_level = "second"),
   f_meas(nba_resultados, truth = Play, 
-         estimate = .pred_rf, event_level = "second")
-) |> 
+         estimate = .pred_rf, event_level = "second")) |> 
   kable()
 ```
 
-| Métrica   | Valor | Interpretación                                                                                     |
-|-----------------|-----------------|--------------------------------------|
-| Accuracy  | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba.  |
-| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran.            |
-| Recall    | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star.           |
-| F1-score  | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
+| Métrica | Valor | Interpretación |
+|------------------|------------------|-------------------------------------|
+| Accuracy | 0,960 | El modelo clasificó correctamente aproximadamente el 96% de los jugadores del conjunto de prueba. |
+| Precision | 0,917 | De todos los jugadores que el modelo predijo como All-Star, el 91,7% realmente lo eran. |
+| Recall | 0,688 | El modelo logró identificar el 68,8% de los jugadores que efectivamente fueron All-Star. |
+| F1-score | 0,786 | Resume el equilibrio entre precisión y recall. Un valor de 78,6% indica un buen desempeño general. |
 
 #### *Calculo de probabilidades de que un jugador sea All Star.*
 
-Además de clasificar a los jugadores como All Star o No All Star, el modelo también permite estimar las probabilidades de que un jugador sea seleccionado al All Star. A continuación se desarrollara una aplicación Shiny aprovechando esta característica.
+Además de clasificar a los jugadores como All Star o No All Star, el modelo también permite estimar las probabilidades de que un jugador sea seleccionado al All Star. A continuación se desarrollará una aplicación Shiny aprovechando esta característica.
 
 ```{r}
 nba_prob <- nba_test |>
@@ -313,27 +363,4 @@ Esta linea de codigo anterior sirve para vincular nuestro modelo a la aplicació
 
 ### *6 - Conclusiones*
 
-A raíz de lo presentado podemos concluir que el modelo predice con bajo margen de error si un jugador llega a ser All-Star o no.
-
-Comparación de temporadas
-
-```{r}
-prueba <- datos %>% 
-  filter(G >= 60) %>% 
-  select(Player.x, Pos1, G, MP, TRB, AST, STL, BLK, PTS, Play, Season)
-```
-
-robos:
-
-```{r}
-ggplot(prueba, aes(x = Play, y = PTS, fill = Play)) +
-  geom_boxplot(alpha = 0.8, outlier.shape = NA) +
-  facet_wrap(~Season) +
-  geom_jitter(width = 0.15, alpha = 0.5, size = 1.5) +
-  scale_x_discrete(labels = c("No" = "No All-Star", "Yes" = "All-Star")) +
-  labs(
-    title = "Puntos por partido según condición de All-Star por temporada", 
-    x = "", y = "Puntos por partido") +
-  theme_classic() +
-  theme(legend.position = "no")
-```
+En base de lo presentado podemos concluir que el modelo predice con bajo margen de error, a raíz de las estadísticas individuales, la probabilidad de que un jugador llegue a ser All-Star o no. Dentro de los datos analizados, los puntos son la estadística que mayor peso tienen, seguido de las asistencias y rebotes. Sin embargo, los resultados presentados indican que las estadísticas individuales no son la única variable de la cual depende si un jugador puede ser seleccionado All-Star o no, sino que depende también de otros factores que no son contemplados en este modelo a pesar de que influyan en la decisión final.
